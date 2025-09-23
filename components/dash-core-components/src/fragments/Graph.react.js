@@ -457,27 +457,6 @@ class PlotlyGraph extends Component {
         });
     }
 
-    getStyle() {
-        const {responsive} = this.props;
-        let {style} = this.props;
-
-        // When there is no forced responsive style, return the original style property
-        if (!responsive) {
-            return style;
-        }
-
-        // Otherwise, if the height is not set, we make the graph size equal to the parent one
-        if (!style) {
-            style = {};
-        }
-
-        if (!style.height) {
-            return Object.assign({height: '100%'}, style);
-        }
-
-        return style;
-    }
-
     componentDidMount() {
         const p = this.plot(this.props);
         this._queue = this.amendTraces(p, {}, this.props);
@@ -536,46 +515,34 @@ class PlotlyGraph extends Component {
     }
 
     render() {
-        const {className, id, loading_state} = this.props;
-        const style = this.getStyle();
-
+        const {className, id, loading_state, style} = this.props;
+        let Container = LoadingElement;
+        const containerProps = {
+            className,
+            id,
+            key: id,
+            ref: this.parentElement,
+            style,
+        };
         if (window.dash_component_api) {
-            return (
-                <LoadingElement
-                    id={id}
-                    key={id}
-                    className={className}
-                    style={style}
-                    ref={this.parentElement}
-                >
-                    <ResizeDetector
-                        onResize={this.graphResize}
-                        targets={[this.parentElement, this.gd]}
-                    />
-                    <div
-                        ref={this.gd}
-                        style={{height: '100%', width: '100%'}}
-                    />
-                </LoadingElement>
-            );
+            Container = 'div';
+            containerProps['data-dash-is-loading'] =
+                loading_state?.is_loading || undefined;
         }
+        // Force zero values to avoid unintended triggering of resize detector. This isn't exhaustive,
+        // but should cover the most common styles.
+        const containerStyles =
+            '.js-plotly-plot, .js-plotly-plot * {border: 0; margin: 0; padding: 0;}';
+
         return (
-            <div
-                id={id}
-                key={id}
-                className={className}
-                style={style}
-                ref={this.parentElement}
-                data-dash-is-loading={
-                    (loading_state && loading_state.is_loading) || undefined
-                }
-            >
+            <Container {...containerProps}>
                 <ResizeDetector
                     onResize={this.graphResize}
                     targets={[this.parentElement, this.gd]}
                 />
                 <div ref={this.gd} style={{height: '100%', width: '100%'}} />
-            </div>
+                <style>{containerStyles}</style>
+            </Container>
         );
     }
 }

@@ -34,7 +34,11 @@ const ResizeDetector = props => {
         };
     }, [ref.current]);
 
-    return <div ref={ref}>{children}</div>;
+    return (
+        <div style={{border: 0, margin: 0, padding: 0}} ref={ref}>
+            {children}
+        </div>
+    );
 };
 
 ResizeDetector.propTypes = {
