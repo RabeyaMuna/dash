@@ -74,9 +74,9 @@ def test_pala001_layout(dash_duo, clear_pages_state):
 
     # test query strings
     dash_duo.wait_for_page(url=f"{dash_duo.server_url}/query-string?velocity=10")
-    assert (
-        dash_duo.find_element("#velocity").get_attribute("value") == "10"
-    ), "query string passed to layout"
+    assert dash_duo.find_element("#velocity").get_attribute("value") == "10", (
+        "query string passed to layout"
+    )
 
     # test path variables
     dash_duo.wait_for_page(url=f"{dash_duo.server_url}/a/none/b/none")
@@ -255,7 +255,7 @@ def test_pala006_pages_external_library(dash_duo):
         path="/",
         layout=html.Div(
             [
-                dt.DelayedEventComponent(id="button"),
+                dt.DelayedEventComponent(id="button", disabled=False),
                 html.Div("The button has not been clicked yet", id="out"),
             ]
         ),

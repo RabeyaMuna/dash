@@ -613,8 +613,7 @@ def generate_rpkg(
     else:
         package_issues = ""
         print(
-            "Warning: a URL for bug reports was "
-            "not provided. Empty string inserted.",
+            "Warning: a URL for bug reports was not provided. Empty string inserted.",
             file=sys.stderr,
         )
 
@@ -759,7 +758,7 @@ def generate_exports(
     package_depends,
     package_imports,
     package_suggests,
-    **kwargs
+    **kwargs,
 ):
     export_string = make_namespace_exports(components, prefix)
 

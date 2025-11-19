@@ -80,7 +80,7 @@ def concat_callback(app, flavor, outputs, inputs, prevent_initial_call=False):
             ),
             outputs,
             inputs,
-            **kwargs
+            **kwargs,
         )
     else:
 
@@ -159,7 +159,7 @@ def test_cbpi001_prevent_initial_call(flavor, dash_duo):
 
     # check from the end, to ensure the callbacks are all done
     dash_duo.wait_for_text_to_equal("#f", "AAD")
-    dash_duo.wait_for_text_to_equal("#e", "AD"),
+    (dash_duo.wait_for_text_to_equal("#e", "AD"),)
     dash_duo.wait_for_text_to_equal("#d", "D")
     dash_duo.wait_for_text_to_equal("#c", "C")
     dash_duo.wait_for_text_to_equal("#b", "A")
@@ -168,7 +168,7 @@ def test_cbpi001_prevent_initial_call(flavor, dash_duo):
     dash_duo.find_element("#btn").click()
 
     dash_duo.wait_for_text_to_equal("#f", "ClickClickD")
-    dash_duo.wait_for_text_to_equal("#e", "ClickD"),
+    (dash_duo.wait_for_text_to_equal("#e", "ClickD"),)
     dash_duo.wait_for_text_to_equal("#d", "D")
     dash_duo.wait_for_text_to_equal("#c", "Click")
     dash_duo.wait_for_text_to_equal("#b", "Click")
@@ -251,7 +251,7 @@ def test_cbpi002_pattern_matching(flavor, dash_duo):
 
     # check from the end, to ensure the callbacks are all done
     dash_duo.wait_for_text_to_equal(".f", "AAD")
-    dash_duo.wait_for_text_to_equal(".e", "AD"),
+    (dash_duo.wait_for_text_to_equal(".e", "AD"),)
     dash_duo.wait_for_text_to_equal(".d", "D")
     dash_duo.wait_for_text_to_equal(".c", "C")
     dash_duo.wait_for_text_to_equal(".b", "A")
@@ -260,7 +260,7 @@ def test_cbpi002_pattern_matching(flavor, dash_duo):
     dash_duo.find_element(".btn").click()
 
     dash_duo.wait_for_text_to_equal(".f", "ClickClickD")
-    dash_duo.wait_for_text_to_equal(".e", "ClickD"),
+    (dash_duo.wait_for_text_to_equal(".e", "ClickD"),)
     dash_duo.wait_for_text_to_equal(".d", "D")
     dash_duo.wait_for_text_to_equal(".c", "Click")
     dash_duo.wait_for_text_to_equal(".b", "Click")

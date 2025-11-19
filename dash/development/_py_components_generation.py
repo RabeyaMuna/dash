@@ -728,7 +728,7 @@ def map_js_to_py_types_flow_types(type_object):
         # Flow's Array type
         Array=lambda: "list"
         + (
-            f' of {js_to_py_type(type_object["elements"][0])}s'
+            f" of {js_to_py_type(type_object['elements'][0])}s"
             if js_to_py_type(type_object["elements"][0]) != ""
             else ""
         ),
