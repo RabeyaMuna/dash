@@ -539,7 +539,7 @@ def test_async_cbsc011_one_call_for_multiple_outputs_initial(dash_duo):
 
     assert call_count.value == 1
     inputs = [f'"Input {i}"' for i in range(10)]
-    expected = f'[{", ".join(inputs)}]'
+    expected = f"[{', '.join(inputs)}]"
     dash_duo.wait_for_text_to_equal("#container", expected)
     assert dash_duo.get_logs() == []
 
@@ -587,7 +587,7 @@ def test_async_cbsc012_one_call_for_multiple_outputs_update(dash_duo):
 
     ### order altered from the original, as these are non-blocking callbacks now
     inputs = [f'"Input {i}"' for i in range(10)]
-    expected = f'[{", ".join(inputs)}]'
+    expected = f"[{', '.join(inputs)}]"
     dash_duo.wait_for_text_to_equal("#dynamic-output", expected)
     assert call_count.value == 1
     assert dash_duo.get_logs() == []
