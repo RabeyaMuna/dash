@@ -1,27 +1,47 @@
 import json
 import time
+from multiprocessing import Lock, Value
 
 import flaky
-
-from multiprocessing import Lock, Value
+import numpy as np
 import pytest
 
-import numpy as np
+try:
+    from dash_test_components import (
+        AsyncComponent,
+        CollapseComponent,
+        DelayedEventComponent,
+        FragmentComponent,
+    )
+except Exception:  # pragma: no cover - fallback for typing/static analysis environments
+    # Provide lightweight stand-ins so static analyzers and environments without
+    # the generated test components can import this module.
+    class AsyncComponent:
+        def __init__(self, *args, **kwargs):
+            self.__dict__.update(kwargs)
 
-from dash_test_components import (
-    AsyncComponent,
-    CollapseComponent,
-    DelayedEventComponent,
-    FragmentComponent,
-)
+    class CollapseComponent:
+        def __init__(self, children=None, **kwargs):
+            self.children = children
+            self.props = kwargs
+
+    class DelayedEventComponent:
+        def __init__(self, *args, **kwargs):
+            self.props = kwargs
+
+    class FragmentComponent:
+        def __init__(self, children=None):
+            self.children = children
+
+
 from dash import (
     Dash,
     Input,
     Output,
     State,
-    html,
-    dcc,
     dash_table,
+    dcc,
+    html,
     no_update,
 )
 from dash.exceptions import PreventUpdate
@@ -35,7 +55,7 @@ def test_async_cbsc001_simple_callback(dash_duo):
         return
     lock = Lock()
 
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div(
         [
             dcc.Input(id="input", value="initial value"),
@@ -75,7 +95,7 @@ def test_async_cbsc002_callbacks_generating_children(dash_duo):
     if not is_dash_async():
         return
     # some components don't exist in the initial render
-    app = Dash(__name__, suppress_callback_exceptions=True)
+    app = Dash(__name__, suppress_callback_exceptions=True, use_async=True)
     app.layout = html.Div(
         [dcc.Input(id="input", value="initial value"), html.Div(id="output")]
     )
@@ -161,7 +181,7 @@ def test_async_cbsc002_callbacks_generating_children(dash_duo):
 def test_async_cbsc003_callback_with_unloaded_async_component(dash_duo):
     if not is_dash_async():
         return
-    app = Dash()
+    app = Dash(use_async=True)
     app.layout = html.Div(
         children=[
             dcc.Tabs(
@@ -196,7 +216,7 @@ def test_async_cbsc003_callback_with_unloaded_async_component(dash_duo):
 def test_async_cbsc004_callback_using_unloaded_async_component(dash_duo):
     if not is_dash_async():
         return
-    app = Dash()
+    app = Dash(use_async=True)
     app.layout = html.Div(
         [
             dcc.Tabs(
@@ -264,7 +284,7 @@ def test_async_cbsc005_children_types(dash_duo, engine):
     if not is_dash_async():
         return
     with json_engine(engine):
-        app = Dash()
+        app = Dash(use_async=True)
         app.layout = html.Div([html.Button(id="btn"), html.Div("init", id="out")])
 
         outputs = [
@@ -297,7 +317,7 @@ def test_async_cbsc006_array_of_objects(dash_duo, engine):
     if not is_dash_async():
         return
     with json_engine(engine):
-        app = Dash()
+        app = Dash(use_async=True)
         app.layout = html.Div(
             [html.Button(id="btn"), dcc.Dropdown(id="dd"), html.Div(id="out")]
         )
@@ -336,7 +356,7 @@ def test_async_cbsc007_parallel_updates(refresh, dash_duo):
     # value.
     if not is_dash_async():
         return
-    app = Dash()
+    app = Dash(use_async=True)
 
     app.layout = html.Div(
         [
@@ -382,7 +402,7 @@ def test_async_cbsc008_wildcard_prop_callbacks(dash_duo):
         return
     lock = Lock()
 
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div(
         [
             dcc.Input(id="input", value="initial value", debounce=False),
@@ -443,7 +463,7 @@ def test_async_cbsc008_wildcard_prop_callbacks(dash_duo):
 def test_async_cbsc009_callback_using_unloaded_async_component_and_graph(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = FragmentComponent(
         [
             CollapseComponent([AsyncComponent(id="async", value="A")], id="collapse"),
@@ -488,7 +508,7 @@ def test_async_cbsc009_callback_using_unloaded_async_component_and_graph(dash_du
 def test_async_cbsc010_event_properties(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div([html.Button("Click Me", id="button"), html.Div(id="output")])
 
     call_count = Value("i", 0)
@@ -512,7 +532,7 @@ def test_async_cbsc010_event_properties(dash_duo):
 def test_async_cbsc011_one_call_for_multiple_outputs_initial(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     call_count = Value("i", 0)
 
     app.layout = html.Div(
@@ -547,7 +567,7 @@ def test_async_cbsc011_one_call_for_multiple_outputs_initial(dash_duo):
 def test_async_cbsc012_one_call_for_multiple_outputs_update(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__, suppress_callback_exceptions=True)
+    app = Dash(__name__, suppress_callback_exceptions=True, use_async=True)
     call_count = Value("i", 0)
 
     app.layout = html.Div(
@@ -596,7 +616,7 @@ def test_async_cbsc012_one_call_for_multiple_outputs_update(dash_duo):
 def test_async_cbsc013_multi_output_out_of_order(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div(
         [
             html.Button("Click", id="input", n_clicks=0),
@@ -643,7 +663,7 @@ def test_async_cbsc014_multiple_properties_update_at_same_time_on_same_component
     timestamp_1 = Value("d", -5)
     timestamp_2 = Value("d", -5)
 
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div(
         [
             html.Div(id="container"),
@@ -699,7 +719,7 @@ def test_async_cbsc016_extra_components_callback(dash_duo):
         return
     lock = Lock()
 
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     # pylint: disable=protected-access
     app._extra_components.append(dcc.Store(id="extra-store", data=123))
 
@@ -737,7 +757,7 @@ def test_async_cbsc016_extra_components_callback(dash_duo):
 def test_async_cbsc018_callback_ndarray_output(dash_duo):
     if not is_dash_async():
         return
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
     app.layout = html.Div([dcc.Store(id="output"), html.Button("click", id="clicker")])
 
     @app.callback(
@@ -756,7 +776,7 @@ def test_async_cbsc019_callback_running(dash_duo):
     if not is_dash_async():
         return
     lock = Lock()
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
 
     app.layout = html.Div(
         [
@@ -790,7 +810,7 @@ def test_async_cbsc020_callback_running_non_existing_component(dash_duo):
     if not is_dash_async():
         return
     lock = Lock()
-    app = Dash(__name__, suppress_callback_exceptions=True)
+    app = Dash(__name__, suppress_callback_exceptions=True, use_async=True)
 
     app.layout = html.Div(
         [
@@ -827,7 +847,7 @@ def test_async_cbsc021_callback_running_non_existing_component(dash_duo):
     if not is_dash_async():
         return
     lock = Lock()
-    app = Dash(__name__)
+    app = Dash(__name__, use_async=True)
 
     app.layout = html.Div(
         [

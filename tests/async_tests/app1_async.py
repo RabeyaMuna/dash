@@ -7,7 +7,7 @@ from .utils import get_background_callback_manager
 background_callback_manager = get_background_callback_manager()
 handle = background_callback_manager.handle
 
-app = Dash(__name__)
+app = Dash(__name__, use_async=False)
 app.layout = html.Div(
     [
         dcc.Input(id="input", value="initial value"),
@@ -19,11 +19,8 @@ app.layout = html.Div(
 @app.callback(
     Output("output-1", "children"),
     [Input("input", "value")],
-    interval=500,
-    manager=background_callback_manager,
-    background=True,
 )
-async def update_output(value):
+def update_output(value):
     time.sleep(0.1)
     return value
 

@@ -1,12 +1,13 @@
 # pylint: disable=too-few-public-methods
 """Utils methods for pytest-dash such wait_for wrappers."""
 
-import time
 import logging
+import time
+
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
-from dash.testing.errors import TestingTimeoutError
 
+from dash.testing.errors import TestingTimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +74,11 @@ class contains_text:
     def message(self, driver):
         try:
             element = self._get_element(driver)
-            text = "found: " + str(element.text) or str(element.get_attribute("value"))
+            text = (
+                ("found: " + str(element.text))
+                if element.text
+                else str(element.get_attribute("value"))
+            )
         except WebDriverException:
             text = f"{self.selector} not found"
         return f"text -> {self.text} not found inside element within {self.timeout}s, {text}"
@@ -119,7 +124,11 @@ class text_to_equal:
     def message(self, driver):
         try:
             element = self._get_element(driver)
-            text = "found: " + str(element.text) or str(element.get_attribute("value"))
+            text = (
+                ("found: " + str(element.text))
+                if element.text
+                else str(element.get_attribute("value"))
+            )
         except WebDriverException:
             text = f"{self.selector} not found"
         return f"text -> {self.text} not found within {self.timeout}s, {text}"

@@ -1,27 +1,31 @@
 from __future__ import annotations
 
-from contextvars import copy_context
-from typing import TYPE_CHECKING, Any, Callable, Dict
 import asyncio
+import inspect
+import mimetypes
 import pkgutil
 import sys
-import mimetypes
 import time
-import inspect
 import traceback
+from contextvars import copy_context
+from typing import TYPE_CHECKING, Any, Callable, Dict
+
 from flask import (
-    Flask,
     Blueprint,
+    Flask,
     Response,
-    request,
     jsonify,
+    request,
+)
+from flask import (
     g as flask_g,
 )
 
-from dash.fingerprint import check_fingerprint
 from dash import _validate
-from dash.exceptions import PreventUpdate, InvalidResourceError
-from dash._callback import _invoke_callback, _async_invoke_callback
+from dash._callback import _async_invoke_callback, _invoke_callback
+from dash.exceptions import InvalidResourceError, PreventUpdate
+from dash.fingerprint import check_fingerprint
+
 from .base_server import BaseDashServer, RequestAdapter
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
@@ -69,7 +73,7 @@ class FlaskDashServer(BaseDashServer):
         try:
             from werkzeug.debug import (
                 tbtools,
-            )  # pylint: disable=import-outside-toplevel
+            )
         except ImportError:
             tbtools = None
 
@@ -213,11 +217,8 @@ class FlaskDashServer(BaseDashServer):
             )
             response_data = ctx.run(partial_func)
             if asyncio.iscoroutine(response_data):
-                raise Exception(
-                    "You are trying to use a coroutine without dash[async]. "
-                    "Please install the dependencies via `pip install dash[async]` and ensure "
-                    "that `use_async=False` is not being passed to the app."
-                )
+                # Run the coroutine to completion for sync (non-async) apps
+                response_data = asyncio.run(response_data)
             cb_ctx.dash_response.set_data(response_data)
             return cb_ctx.dash_response
 

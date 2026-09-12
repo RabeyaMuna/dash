@@ -1,38 +1,36 @@
 # pylint: disable=missing-docstring
+import logging
 import os
 import sys
 import time
-import logging
-from typing import Union, Optional
 import warnings
+from typing import Optional, Union
+
 import percy
 import requests
-
 from selenium import webdriver
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-
 from selenium.common.exceptions import (
-    WebDriverException,
-    TimeoutException,
     MoveTargetOutOfBoundsException,
+    TimeoutException,
+    WebDriverException,
 )
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
+from dash.testing.consts import SELENIUM_GRID_DEFAULT
+from dash.testing.dash_page import DashPageMixin
+from dash.testing.errors import BrowserError, DashAppLoadingError, TestingTimeoutError
 from dash.testing.wait import (
-    text_to_equal,
-    style_to_equal,
     class_to_equal,
-    contains_text,
     contains_class,
+    contains_text,
+    style_to_equal,
+    text_to_equal,
     until,
 )
-from dash.testing.dash_page import DashPageMixin
-from dash.testing.errors import DashAppLoadingError, BrowserError, TestingTimeoutError
-from dash.testing.consts import SELENIUM_GRID_DEFAULT
-
 
 logger = logging.getLogger(__name__)
 
@@ -291,7 +289,7 @@ class Browser(DashPageMixin):
             )
 
             return _wait.until(method)
-        except Exception as err:
+        except TimeoutException as err:
             if callable(msg):
                 message = msg(self.driver)
             else:

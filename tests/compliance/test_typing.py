@@ -57,7 +57,6 @@ invalid_callback = "[]"
 
 
 def run_module(codefile: str, module: str, extra: str = ""):
-
     cmd = shlex.split(
         f"{sys.executable} -m {module} {codefile}{extra}",
         posix=sys.platform != "win32",
@@ -65,6 +64,14 @@ def run_module(codefile: str, module: str, extra: str = ""):
     )
 
     env = os.environ.copy()
+
+    # Ensure the subprocess can resolve imports from the generated module by
+    # adding the directory containing the codefile to PYTHONPATH.
+    code_dir = os.path.dirname(os.path.abspath(codefile))
+    existing_py = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        os.pathsep.join([code_dir, existing_py]) if existing_py else code_dir
+    )
 
     proc = subprocess.Popen(
         cmd,
