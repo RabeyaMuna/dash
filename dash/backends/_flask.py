@@ -213,11 +213,7 @@ class FlaskDashServer(BaseDashServer):
             )
             response_data = ctx.run(partial_func)
             if asyncio.iscoroutine(response_data):
-                raise Exception(
-                    "You are trying to use a coroutine without dash[async]. "
-                    "Please install the dependencies via `pip install dash[async]` and ensure "
-                    "that `use_async=False` is not being passed to the app."
-                )
+                response_data = asyncio.run(response_data)
             cb_ctx.dash_response.set_data(response_data)
             return cb_ctx.dash_response
 

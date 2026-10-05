@@ -6,7 +6,7 @@ import sys
 import pytest
 
 component_template = """
-from dash_generator_test_component_typescript import TypeScriptComponent
+from tests.compliance.dash_generator_test_component_typescript import TypeScriptComponent
 
 t = TypeScriptComponent({0})
 """
@@ -65,6 +65,12 @@ def run_module(codefile: str, module: str, extra: str = ""):
     )
 
     env = os.environ.copy()
+    pythonpath = env.get("PYTHONPATH")
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    tests_root = os.path.dirname(__file__)
+    env["PYTHONPATH"] = os.pathsep.join(
+        p for p in [repo_root, tests_root, pythonpath] if p
+    )
 
     proc = subprocess.Popen(
         cmd,

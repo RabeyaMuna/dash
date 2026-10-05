@@ -94,3 +94,8 @@ packages/
 !components/dash-table/tests/assets/*.csv
 !components/dash-table/tests/selenium/assets/*.csv
 dash_config.json
+# Shell redirection artifacts
+=[0-9]*
+>[0-9]*
+*.tmp
+*.log

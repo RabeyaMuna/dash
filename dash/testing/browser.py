@@ -291,7 +291,7 @@ class Browser(DashPageMixin):
             )
 
             return _wait.until(method)
-        except Exception as err:
+        except TimeoutException as err:
             if callable(msg):
                 message = msg(self.driver)
             else:
