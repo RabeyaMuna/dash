@@ -16,7 +16,7 @@ const DataTable = props => {
             loading.property === '' ||
             loading.property === undefined
     });
-    const id = useMemo(() => id || genRandomId('table-'), [id]);
+    const id = useMemo(() => props.id || genRandomId('table-'), [props.id]);
     const sanitizer = useMemo(() => new Sanitizer(), []);
 
     if (!isValidProps(props)) {
