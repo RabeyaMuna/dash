@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'; // polyfill required by @plotly/dash-component-plugins' asyncDecorator
 import 'css.escape'; // polyfill
 
 import Environment from 'core/environment';
