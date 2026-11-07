@@ -296,7 +296,8 @@ class Browser(DashPageMixin):
                 message = msg(self.driver)
             else:
                 message = msg
-            raise TimeoutException(str(message)) from err
+            logs = "\n".join(str(log) for log in (self.get_logs() or []))
+            raise TimeoutException(f"{message}\nConsole Logs => {logs}") from err
 
     def wait_for_element(self, selector, timeout=None):
         """wait_for_element is shortcut to `wait_for_element_by_css_selector`
