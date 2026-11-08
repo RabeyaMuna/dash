@@ -4,6 +4,7 @@ from functools import wraps
 import inspect
 
 from dash.testing.browser import Browser
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -591,11 +592,19 @@ class DataTableFacade(object):
 class DataTableMixin(object):
     @preconditions(_validate_id, _validate_state)
     def _wait_for_table(self, id, state=_ANY):
-        return WebDriverWait(self.driver, _TIMEOUT).until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "#{} {}".format(id, state))
+        try:
+            return WebDriverWait(self.driver, _TIMEOUT).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "#{} {}".format(id, state))
+                )
             )
-        )
+        except TimeoutException as exc:
+            logs = "\n".join(str(log) for log in (self.get_logs() or []))
+            html = self.find_element("body").get_property("innerHTML")
+            raise TimeoutException(
+                f"table #{id} {state} not found within {_TIMEOUT}s\n"
+                f"Console Logs => {logs}\nHTML => {html}"
+            ) from exc
 
     @preconditions(_validate_id)
     def table(self, id):
